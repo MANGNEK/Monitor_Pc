@@ -53,7 +53,7 @@ int TX_LED_Delay = 0; // TX blink delay
 //----------------------------- Battery Monitor ------------------------------------
 /*WARNING!!! Requires voltage divider (GND ---[100K]--- (Pin34 ADC) ----[100k]--- BATT+) (0%)3.2v to (100%)4.2v Range,*/
 
-#define batteryMonitor // (experimental) Read current LiPo battery level if connected.
+//#define batteryMonitor // (experimental) Read current LiPo battery level if connected.
 
 //-------------------------------- DISCLAIMER -------------------------------------------
 /*
@@ -105,15 +105,15 @@ int TX_LED_Delay = 0; // TX blink delay
 
 /* Manually name the  CPU,*/
 //#define Manual_cpuName
-String set_CPUname = "xxxxxxxx";
+String set_CPUname = "i9-12900K";
 
 /* Manually name the GPU,*/
 //#define Manual_gpuName
-String set_GPUname = "xxxxxxxx";
+String set_GPUname = "Geforce RTX 3080";
 
 /* Manually set GPU ram total,*/
 //#define Manual_gpuRam
-String set_GPUram = "xx";
+String set_GPUram = "256";
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>
 #define noDegree      // lose the "o"
@@ -128,8 +128,8 @@ String set_GPUram = "xx";
 #define GPU_TJMAX 83   //  TJ Max for the Nvidia GTX1080 = 83c
 
 /* CPU & GPU Turbo/Boost Frequency Values in Mhz */
-#define CPU_BOOST 3700  //  Enter Stock CPU Frequency eg. Intel Core i5 9600k = 3700MHz
-#define GPU_BOOST 1683  //  Enter Stock GPU Frequency eg. MSi GamingX 1080  = 1683MHz
+#define CPU_BOOST 1600  //  Enter Stock CPU Frequency eg. Intel Core i5 9600k = 3700MHz
+#define GPU_BOOST 1110  //  Enter Stock GPU Frequency eg. MSi GamingX 1080  = 1683MHz
 
 //-------------------------------- Show GPU Stats ------------------------------------
 
@@ -153,8 +153,8 @@ String set_GPUram = "xx";
 #define enable_ShowFrequencyGain
 
 /* Uncomment only one of the units to display below, MHz or Percent */
-//#define ShowFrequencyGainMHz        // Show Overlock/Turbo & Boost Clock Frequency Gains in MHZ  eg: "+24MHz"
-#define ShowFrequencyGainPerc       // Show Overlock/Turbo & Boost Clock Frequency Gains in Percent  eg: "+24%"
+#define ShowFrequencyGainMHz        // Show Overlock/Turbo & Boost Clock Frequency Gains in MHZ  eg: "+24MHz"
+//#define ShowFrequencyGainPerc       // Show Overlock/Turbo & Boost Clock Frequency Gains in Percent  eg: "+24%"
 
 //----------------------------- Throttle/Boost Indicator --------------------------------
 
@@ -164,10 +164,10 @@ String set_GPUram = "xx";
 //-------------------------------- NeoPixel Modes -------------------------------------
 #define NUM_PIXELS  8
 /* If  NeoBrightness = 0 Phat-Stats will start with no NeoPixels lit. Turn the Rotary Encoder to turn on the NeoPixels, */
-int NeoBrightness   = 225;           // Global start up brightness
+int NeoBrightness   = 10;           // Global start up brightness
 
 /* Uncomment only one of the below*/
-#define enable_NeopixelGauges     // NeoPixel ring bargraph example
+//#define enable_NeopixelGauges     // NeoPixel ring bargraph example
 
 //#define enable_Thresholdtriggers_PCB // New PCB 4x NeoPixel Rotate States,0,1,2,3  Trigger functions when CPU or GPU thresholds are met
 
@@ -210,7 +210,7 @@ int baudRate  = 9600; // set serial baud rate to match that of HardwareSerialMon
 // BT Board ID
 
 #ifdef LOLIN_D32
-#define device_BT "PC Hardware Monitor"
+#define device_BT "PC Hardware Monitor 1"
 #endif
 
 #ifdef LOLIN32_LITE

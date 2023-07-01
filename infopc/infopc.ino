@@ -83,7 +83,17 @@
 #include "Z_Bitmaps.h"
 
 #include "BluetoothSerial.h" //https://www.electronicshub.org/esp32-bluetooth-tutorial/
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
+// Hàm thực thi cho tác vụ trên lõi CPU 1
+void core0Task(void *parameter) {
+  while (1) {
+    rainbowCycle(2);
+     Serial.println("Core 1 is running...");
+    // delay(1000); // Độ trễ 1 giây
+  }
+}
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled!
@@ -103,7 +113,7 @@ BluetoothSerial SerialBT;    // Bluetooth Classic, not BLE
 /* Battery Monitor Settings*/
 #include <Pangodream_18650_CL.h> // Copyright (c) 2019 Pangodream
 
-#define ADC_PIN 34        //!< ADC pin used, default is GPIO34 - ADC1_6 Voltage divider (2* 100K)
+#define ADC_PIN 35        //!< ADC pin used, default is GPIO34 - ADC1_6 Voltage divider (2* 100K)
 #define CONV_FACTOR 1.8 //!< Convertion factor to translate analog units to volts
 #define READS 20
 Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
@@ -115,7 +125,9 @@ Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #define NEOPIN      5
 #define NUM_PIXELS  8 // moved to CFG
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-#define TX_LEDPin 2
+//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
+
+#define TX_LEDPin 18
 /* Pre-define Hex NeoPixel colours,  eg. pixels.setPixelColor(0, BLUE); https://htmlcolorcodes.com/color-names/ */
 #define neo_BLUE       0x0000FF
 #define neo_GREEN      0x008000
@@ -134,7 +146,7 @@ MCUFRIEND_kbv tft;
 
 
 /* Encoder Button pin*/
-int mode_Button     = 35;
+int mode_Button     = 34; 
 int display_Button_counter = 0;
 
 /* Screen TFT backlight Pin */
@@ -239,17 +251,25 @@ boolean stringComplete = false;
 void setup() {
 
 
-#ifdef enable_BT
+//#ifdef enable_BT
   //btStart();
   SerialBT.begin(device_BT); //Bluetooth device name
-#else //USB
+//#else //USB
 
   Serial.begin(baudRate);  //  USB Serial Baud Rate
-#endif
+//#endif
 
   inputString.reserve(220); // String Buffer
 
-
+   xTaskCreatePinnedToCore(
+    core0Task,    // Hàm thực thi lõi CPU 0
+    "Core 0 Task", // Tên luồng
+    10000,        // Kích thước ngăn xếp (bytes)
+    NULL,         // Tham số truyền vào hàm thực thi
+    1,            // Độ ưu tiên luồng
+    NULL,         // Task handle
+    0             // Lõi CPU (0 hoặc 1)
+  );
 
   /* Set up the NeoPixel*/
   pixels.begin();    // This initializes the NeoPixel library.
@@ -271,8 +291,10 @@ void setup() {
   pinMode(TX_LEDPin, OUTPUT); //  Builtin LED /  HIGH(OFF) LOW (ON)
 #endif
 
-  backlightOFF();
 
+  backlightOFF();
+ pinMode(TX_LEDPin, OUTPUT);
+ digitalWrite(TX_LEDPin, LOW);
   /* TFT SETUP */
 
   delay(100); // Give the micro time to initiate the SPi bus
@@ -307,12 +329,46 @@ void loop() {
 
   /*Mode Button, moved to its own tab*/
   button_Modes();
-
+//rainbow(5);
+//rainbowCycle(2);
 }
 
 /* END of Main Loop */
 
+void rainbow(uint8_t wait) {
+  uint16_t i, j;
 
+  for(j=0; j<256; j++) {
+    for(i=0; i<pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+  }
+}
+void rainbowCycle(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+    for(i=0; i< pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+  }
+}
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
 //-----------------------------  NeoPixels RGB  -----------------------------------
 void allNeoPixelsOff() {
   for ( int i = 0; i < NUM_PIXELS; i++ ) {
@@ -353,7 +409,7 @@ void serialBTEvent() {
   while (SerialBT.available()) {
 
     char inChar = (char)SerialBT.read();
-    //Serial.print(inChar); // Debug Incoming Serial
+    Serial.print(inChar); // Debug Incoming Serial
 
     // add it to the inputString:
     inputString += inChar;
@@ -507,7 +563,7 @@ tft.setRotation(1);
 
 
 #ifdef batteryMonitor
-  // Battery Level Indicator on Boot Screen
+  // Battery Level Indicator on Boot Screenn
   //-------------------------------------------------------------
   if (BL.getBatteryVolts() <= 3.4 ) {
 

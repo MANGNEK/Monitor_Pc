@@ -63,7 +63,7 @@ void Display_Port_Batt () {
       //--------------------------------------- Display Background ----------------------------------------------------
 
 
-      tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
+      tft.setRotation(ASPECT);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
       //tft.setRotation(tft_Portait);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
 
       tft.setFont(); // set to default Adafruit library font
@@ -757,7 +757,7 @@ void Display_Port_Batt () {
       //--------------------------Trigger an event when CPU or GPU threshold is met ---------------------------------
 
 
-
+//rainbowCycle(0);
 #ifdef enable_Thresholdtriggers_PCB
 
       //PCB_TriggerCPU_temp_Port( cpuString1.toInt() ); // Neopixel CPU  Temperature

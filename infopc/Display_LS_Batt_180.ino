@@ -14,6 +14,7 @@
 /* Version 3.2 Optimised for ILI9341 320 x 240 in landscape, Do not turn on the screen till there is activity and the Screen is drawn*/
 
 void Display_LS_Batt_180 () {
+
 #ifdef batteryMonitor
 
   if (BL.getBatteryVolts() <= 3.2 ) {
@@ -62,7 +63,7 @@ void Display_LS_Batt_180 () {
       //--------------------------------------- Display Background ----------------------------------------------------
 
 
-      tft.setRotation(3);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
+      tft.setRotation(ASPECT);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
       //tft.setRotation(tft_Landscape_flip);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
 
       tft.setFont(); // set to default Adafruit library font

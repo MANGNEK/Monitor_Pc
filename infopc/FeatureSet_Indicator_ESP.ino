@@ -30,10 +30,10 @@ void FeatureSet_Indicator2 () {
 
   //------ 2A Tacho
 #ifdef enable_NeopixelGauges
-  tft.drawBitmap(82 + X_Offset, 65 + Y_Offset, Neo_Gauges_BMP, 36, 36, ILI9341_WHITE);
+  tft.drawBitmap(82 + X_Offset, 85 + Y_Offset, Neo_Gauges_BMP, 36, 36, ILI9341_WHITE);
 
   // Show default NeoPixel brightness setting
-  tft.setTextColor(ILI9341_WHITE); tft.setCursor(88 + X_Offset, 100 + Y_Offset); tft.print("NEO");
+  tft.setTextColor(ILI9341_WHITE); tft.setCursor(95 + X_Offset, 130 + Y_Offset); tft.print("NEO");
   //tft.setTextColor(ILI9341_WHITE); tft.setCursor(74 + X_Offset, 78 + Y_Offset); tft.print(NeoBrightness);
 
 #else
@@ -51,12 +51,12 @@ void FeatureSet_Indicator2 () {
   tft.setTextColor(ILI9341_WHITE); tft.setCursor(95 + X_Offset, 195 + Y_Offset); tft.print("BT");
 
 #else
-  tft.drawBitmap(88 + X_Offset, 60 + Y_Offset, BT_BMP, 36, 36, ILI9341_GREY);
+  tft.drawBitmap(82 + X_Offset, 150 + Y_Offset, BT_BMP, 36, 36, ILI9341_GREY);
   tft.setTextSize(2);
-  tft.setTextColor(ILI9341_WHITE); tft.setCursor(90 + X_Offset, 55 + Y_Offset); tft.print("USB");
+  tft.setTextColor(ILI9341_WHITE); tft.setCursor(95 + X_Offset, 180 + Y_Offset); tft.print("USB");
   tft.setTextSize(1);
 
-  tft.setTextColor(ILI9341_GREY); tft.setCursor(98 + X_Offset, 78 + Y_Offset); tft.print("OFF");
+  tft.setTextColor(ILI9341_GREY); tft.setCursor(95 + X_Offset, 195 + Y_Offset); tft.print("OFF");
 #endif
 
 
@@ -73,6 +73,6 @@ void FeatureSet_Indicator2 () {
   //
 #endif
 
-  delay(3000);
+  delay(2000);
   tft.setFont(); // Set back to default Adafruit GRFX font
 }
