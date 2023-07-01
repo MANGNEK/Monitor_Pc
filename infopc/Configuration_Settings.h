@@ -174,7 +174,7 @@ int NeoBrightness   = 10;           // Global start up brightness
 
 
 //----------------------------- TFT Fixed or PWM Brightness ------------------------------------
-#define fixedBacklight // enable a fixed backlight (no PWM) powered from VCC
+//#define fixedBacklight // enable a fixed backlight (no PWM) powered from VCC
 
 /*TFT Start Up Brightness*/
 volatile int brightness_count = 250; // Start Up PWM Brightness
@@ -182,7 +182,7 @@ volatile int brightness_count = 250; // Start Up PWM Brightness
 //-------------------------- Display Activity Shutdown -----------------------------------
 
 /* Uncomment below to turn off the screen on serial timeout, else keep last display info eg: incase of PC Crash*/
-#define enableActivityChecker
+//#define enableActivityChecker
 
 /* How long the display takes to timeout due to inactive serial data from the windows application */
 #define lastActiveDelay 8000
@@ -198,7 +198,7 @@ volatile int brightness_count = 250; // Start Up PWM Brightness
 /* Debounce  Button, button mode is a bit flaky at present as it needs interrupts, Sometimes it gets caught during a screen refresh
   and does not change. WIO Terminal & ESP32 seem to like 1000ms and works just!!! ok */
 
-int debounceButton = 1000; //  Use a 0.1uf/100nf/(104) p capacitor from button Pin to GND if poss
+int debounceButton = 0; //  Use a 0.1uf/100nf/(104) p capacitor from button Pin to GND if poss
 
 /* Delay screen event, to stop screen data corruption ESP8622 / ESP32 use 25, most others 5 or 0 will do*/
 int Serial_eventDelay = 15;  // 15 is the minimum setting for an ESP32 with a Silicon Labs CP210x serial chip
@@ -209,13 +209,8 @@ int baudRate  = 9600; // set serial baud rate to match that of HardwareSerialMon
 
 // BT Board ID
 
-#ifdef LOLIN_D32
-#define device_BT "PC Hardware Monitor 1"
-#endif
 
-#ifdef LOLIN32_LITE
-#define device_BT "TMLabs_BT_32Lite"
-#endif
+#define device_BT "PC Hardware Monitor 1"
 
 
 //-------------------------------------------- Versions ---------------------------------- -
@@ -261,5 +256,5 @@ int baudRate  = 9600; // set serial baud rate to match that of HardwareSerialMon
 //#define Debug
 
 //-------------- Show Networks Stats when using Phatstats edition of WeeStatServer ---------------
-//#define enable_LibreNet // Reserved // undefine  enable_gpuCore, enable_gpuShader, enable_gpuShader first, enable_gpuPowerStats
+#define enable_LibreNet // Reserved // undefine  enable_gpuCore, enable_gpuShader, enable_gpuShader first, enable_gpuPowerStats
 //--------------------------- Throttle/Boost Gains MHZ or % ------------------------------

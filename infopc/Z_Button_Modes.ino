@@ -18,7 +18,7 @@ void button_Modes() {
     /* Reset count if over max mode number, */
     if (display_Button_counter == 5) // Number of screens available when button pressed
     {
-          tft.fillScreen(ILI9341_BLACK);
+      tft.fillScreen(ILI9341_BLACK);
 
       display_Button_counter = 0;
     }
@@ -30,22 +30,22 @@ void button_Modes() {
     switch (display_Button_counter) {
 
       case 0: // 1st SCREEN
-        ASPECT=0;
+        ASPECT=2;
         Display_Port_Batt();
 
         break;
 
       case 1: // 2nd SCREEN
         // Display_LS_Batt();
-        ASPECT=2;
-        Display_Port_Batt();
-
+        
+        ASPECT=1;
+        Display_LS_Batt();
         break;
 
       case 2: // 3nd SCREEN
         // Display_LS_Batt_180();
-        ASPECT=1;
-        Display_LS_Batt();
+        ASPECT=0;
+        Display_Port_Batt();
 
         break;
 

@@ -715,7 +715,7 @@ void Display_Port_Batt () {
       /* Network Outline, */
 
       //                 ( X  , Y ,  W , H , Radius ,    Color
-      tft.drawRoundRect  (102, 233, 136, 22, 2, ILI9341_RED); //
+      tft.drawRoundRect  (102, 350, 136, 30, 2, ILI9341_RED); //
 
       /* ETHERNET UP String,*/
       int EthUpStringStart = inputString.indexOf("ETU") + 3;
@@ -725,7 +725,7 @@ void Display_Port_Batt () {
 
       /* UP USAGE DISPLAY,*/
       tft.setTextSize(1);
-      tft.setCursor(105, 235);
+      tft.setCursor(105, 355);
       tft.print("Network UP  :");
       tft.println(EthUpString);
 
@@ -737,7 +737,7 @@ void Display_Port_Batt () {
 
       /* DOWN USAGE DISPLAY,*/
       tft.setTextSize(1);
-      tft.setCursor(105, 245);
+      tft.setCursor(105, 365);
       tft.print("Network DOWN:");
       tft.println(EthDownString);
 #endif

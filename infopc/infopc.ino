@@ -86,15 +86,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-// Hàm thực thi cho tác vụ trên lõi CPU 1
-void core0Task(void *parameter) {
-  while (1) {
-    rainbowCycle(2);
-     Serial.println("Core 1 is running...");
-    // delay(1000); // Độ trễ 1 giây
-  }
-}
-
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled!
 #endif
@@ -261,15 +252,6 @@ void setup() {
 
   inputString.reserve(220); // String Buffer
 
-   xTaskCreatePinnedToCore(
-    core0Task,    // Hàm thực thi lõi CPU 0
-    "Core 0 Task", // Tên luồng
-    10000,        // Kích thước ngăn xếp (bytes)
-    NULL,         // Tham số truyền vào hàm thực thi
-    1,            // Độ ưu tiên luồng
-    NULL,         // Task handle
-    0             // Lõi CPU (0 hoặc 1)
-  );
 
   /* Set up the NeoPixel*/
   pixels.begin();    // This initializes the NeoPixel library.
@@ -292,12 +274,21 @@ void setup() {
 #endif
 
 
+xTaskCreatePinnedToCore(
+    core0Task,    // Hàm thực thi lõi CPU 0
+    "Core 0 Task", // Tên luồng
+    10000,        // Kích thước ngăn xếp (bytes)
+    NULL,         // Tham số truyền vào hàm thực thi
+    1,            // Độ ưu tiên luồng
+    NULL,         // Task handle
+    0             // Lõi CPU (0 hoặc 1)
+);
   backlightOFF();
  pinMode(TX_LEDPin, OUTPUT);
  digitalWrite(TX_LEDPin, LOW);
   /* TFT SETUP */
 
-  delay(100); // Give the micro time to initiate the SPi bus
+  delay(200); // Give the micro time to initiate the SPi bus
   int ID = tft.readID();
   tft.begin(ID); //ILI9341
   tft.setRotation(ASPECT);// Rotate the display :  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
@@ -334,6 +325,23 @@ void loop() {
 }
 
 /* END of Main Loop */
+
+// Hàm thực thi cho tác vụ trên lõi CPU 1
+void core0Task(void *parameter) {
+  while (1) {
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+    for(i=0; i< pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+    }
+    pixels.show();
+    delay(2);
+  }
+     //Serial.println("Core 1 is running...");
+    // delay(1000); // Độ trễ 1 giây
+  }
+}
 
 void rainbow(uint8_t wait) {
   uint16_t i, j;
@@ -480,7 +488,7 @@ void activityChecker() {
     tft.setTextSize(2); tft.setCursor(40, 40); tft.println("NO BLUETOOTH!!!");
 
 
-    delay(4000);
+    delay(2000);
 
     /* Clear Screen, Turn Off Backlight & Neopixels when there is no activity, */
 
