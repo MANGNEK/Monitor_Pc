@@ -5,6 +5,7 @@
 void button_Modes() {
 
   int enc_buttonVal = digitalRead(mode_Button);
+  
   if (enc_buttonVal == LOW)
 
   {
@@ -23,9 +24,7 @@ void button_Modes() {
       display_Button_counter = 0;
     }
   }
-
   else
-
     /* Change Mode */
     switch (display_Button_counter) {
 

@@ -1,6 +1,3 @@
-
-#define CODE_VERS  "3.1.6.BT.ADV"  // Code version number
-
 /*
   uVolume, GNATSTATS OLED, PHATSTATS TFT PC Performance Monitor & HardwareSerialMonitor Windows Client
   Rupert Hirst © 2016 - 2023 http://tallmanlabs.com http://runawaybrainz.blogspot.com/
@@ -68,9 +65,7 @@
                SEE CONFIGURATION TAB FIRST, FOR QUICK SETTINGS!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
-
-
-
+#define CODE_VERS  "3.1.6.BT.ADV" 
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -85,118 +80,11 @@
 #include "BluetoothSerial.h" //https://www.electronicshub.org/esp32-bluetooth-tutorial/
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled!
-#endif
-
-BluetoothSerial SerialBT;    // Bluetooth Classic, not BLE
-/*
-
-  Battery Monitor   Voltage divider (GND ---[100K]--- (Pin34 ADC) ----[100k]--- BATT+) 3.2v to 4.2v Range
-  --------------------
-  Battery Monitor = 34
-  ==========================================================================================================
-*/
-
-#ifdef batteryMonitor
-
-/* Battery Monitor Settings*/
+#include "MCUFRIEND_kbv.h"
+#include <Adafruit_NeoPixel.h>
 #include <Pangodream_18650_CL.h> // Copyright (c) 2019 Pangodream
 
-#define ADC_PIN 35        //!< ADC pin used, default is GPIO34 - ADC1_6 Voltage divider (2* 100K)
-#define CONV_FACTOR 1.8 //!< Convertion factor to translate analog units to volts
-#define READS 20
-Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
-
-#endif
-
-//---------------------------------------------------------------------------------------
-#include <Adafruit_NeoPixel.h>
-#define NEOPIN      5
-#define NUM_PIXELS  8 // moved to CFG
-Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
-
-#define TX_LEDPin 18
-/* Pre-define Hex NeoPixel colours,  eg. pixels.setPixelColor(0, BLUE); https://htmlcolorcodes.com/color-names/ */
-#define neo_BLUE       0x0000FF
-#define neo_GREEN      0x008000
-#define neo_RED        0xFF0000
-#define neo_ORANGE     0xFFA500
-#define neo_DARKORANGE 0xFF8C00
-#define neo_YELLOW     0xFFFF00
-#define neo_WHITE      0xFFFFFF
-#define neo_BLACK      0x000000 // OFF
-
-#include "MCUFRIEND_kbv.h"
-MCUFRIEND_kbv tft;
-
-
-//-----------------------------------------------------------------------------
-
-
-/* Encoder Button pin*/
-int mode_Button     = 34; 
-int display_Button_counter = 0;
-
-/* Screen TFT backlight Pin */
-int TFT_backlight_PIN = 0;
-
-
-/* Encoder TFT Brightness*/ //Reserved!!! not supported on ESP32 Reserved
-//volatile int brightness_count = 150; // Start Up PWM Brightness, moved to CFG!!!
-int brightness_countLast      = 0;   // Store Last PWM Value
-
-//-----------------------------------------------------------------------------
-
-/* Display screen rotation  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)*/
-int ASPECT = 0; //Do not adjust,
-
-/* More Display stuff*/
-int displayDraw = 0;
-
-//-----------------------------------------------------------------------------
-
-/* Timer for active connection to host*/
-boolean activeConn = false;
-long lastActiveConn = 0;
-boolean bootMode = true;
-
-/* Vars for serial input*/
-String inputString = "";
-boolean stringComplete = false;
-
-//-----------------------------  TFT Colours  ---------------------------------
-
-#define ILI9341_TEST        0x6A4E
-#define ILI9341_BLACK       0x0000
-#define ILI9341_WHITE       0xFFFF
-#define ILI9341_GREY        0x7BEF
-#define ILI9341_LIGHT_GREY  0xC618
-#define ILI9341_GREEN       0x07E0
-#define ILI9341_LIME        0x87E0
-#define ILI9341_BLUE        0x001F
-#define ILI9341_RED         0xF800
-#define ILI9341_AQUA        0x5D1C
-#define ILI9341_YELLOW      0xFFE0
-#define ILI9341_MAGENTA     0xF81F
-#define ILI9341_CYAN        0x07FF
-#define ILI9341_DARK_CYAN   0x03EF
-#define ILI9341_ORANGE      0xFCA0
-#define ILI9341_PINK        0xF97F
-#define ILI9341_BROWN       0x8200
-#define ILI9341_VIOLET      0x9199
-#define ILI9341_SILVER      0xA510
-#define ILI9341_GOLD        0xA508
-#define ILI9341_NAVY        0x000F
-#define ILI9341_MAROON      0x7800
-#define ILI9341_PURPLE      0x780F
-#define ILI9341_OLIVE       0x7BE0
-
 //------------------------- CRT Style Colour Profiles ----------------------
-
-
 #ifdef  RETRO_MONO
 #define ILI9341_YELLOW      0xFFFF //ILI9341_WHITE
 #define ILI9341_WHITE       0xFFFF //ILI9341_WHITE
@@ -235,13 +123,95 @@ boolean stringComplete = false;
 #define ILI9341_LIGHT_GREY  0x7BE0 //ILI9341_OLIVE
 #endif
 
+#define TX_LEDPin 18
+/* Pre-define Hex NeoPixel colours,  eg. pixels.setPixelColor(0, BLUE); https://htmlcolorcodes.com/color-names/ */
+#define neo_BLUE       0x0000FF
+#define neo_GREEN      0x008000
+#define neo_RED        0xFF0000
+#define neo_ORANGE     0xFFA500
+#define neo_DARKORANGE 0xFF8C00
+#define neo_YELLOW     0xFFFF00
+#define neo_WHITE      0xFFFFFF
+#define neo_BLACK      0x000000 // OFF
 
+//-----------------------------  TFT Colours  ---------------------------------
+#define ILI9341_TEST        0x6A4E
+#define ILI9341_BLACK       0x0000
+#define ILI9341_WHITE       0xFFFF
+#define ILI9341_GREY        0x7BEF
+#define ILI9341_LIGHT_GREY  0xC618
+#define ILI9341_GREEN       0x07E0
+#define ILI9341_LIME        0x87E0
+#define ILI9341_BLUE        0x001F
+#define ILI9341_RED         0xF800
+#define ILI9341_AQUA        0x5D1C
+#define ILI9341_YELLOW      0xFFE0
+#define ILI9341_MAGENTA     0xF81F
+#define ILI9341_CYAN        0x07FF
+#define ILI9341_DARK_CYAN   0x03EF
+#define ILI9341_ORANGE      0xFCA0
+#define ILI9341_PINK        0xF97F
+#define ILI9341_BROWN       0x8200
+#define ILI9341_VIOLET      0x9199
+#define ILI9341_SILVER      0xA510
+#define ILI9341_GOLD        0xA508
+#define ILI9341_NAVY        0x000F
+#define ILI9341_MAROON      0x7800
+#define ILI9341_PURPLE      0x780F
+#define ILI9341_OLIVE       0x7BE0
 //--------------------------------
 
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled!
+#endif
+
+/*
+  Battery Monitor   Voltage divider (GND ---[100K]--- (Pin34 ADC) ----[100k]--- BATT+) 3.2v to 4.2v Range
+  --------------------
+  Battery Monitor = 34
+  ==========================================================================================================
+*/
+#ifdef batteryMonitor
+/* Battery Monitor Settings*/
+#define ADC_PIN 35        //!< ADC pin used, default is GPIO34 - ADC1_6 Voltage divider (2* 100K)
+#define CONV_FACTOR 1.8 //!< Convertion factor to translate analog units to volts
+#define READS 20
+Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
+#endif
+//---------------------------------------------------------------------------------------
+
+#define NEOPIN      5
+#define NUM_PIXELS  8 // moved to CFG
+Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
+//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
+
+//-----------------------------------------------------------------------------
+/* Encoder Button pin*/
+int mode_Button     = 34; 
+int display_Button_counter = 0;
+/* Screen TFT backlight Pin */
+int TFT_backlight_PIN = 0;
+/* Encoder TFT Brightness*/ //Reserved!!! not supported on ESP32 Reserved
+//volatile int brightness_count = 150; // Start Up PWM Brightness, moved to CFG!!!
+int brightness_countLast      = 0;   // Store Last PWM Value
+//-----------------------------------------------------------------------------
+/* Display screen rotation  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)*/
+int ASPECT = 0; //Do not adjust,
+/* More Display stuff*/
+int displayDraw = 0;
+//-----------------------------------------------------------------------------
+/* Timer for active connection to host*/
+boolean activeConn = false;
+long lastActiveConn = 0;
+boolean bootMode = true;
+/* Vars for serial input*/
+String inputString = "";
+boolean stringComplete = false;
+
+BluetoothSerial SerialBT;    // Bluetooth Classic, not BLE
+MCUFRIEND_kbv tft;
 
 void setup() {
-
-
 //#ifdef enable_BT
   //btStart();
   SerialBT.begin(device_BT); //Bluetooth device name
@@ -274,15 +244,15 @@ void setup() {
 #endif
 
 
-xTaskCreatePinnedToCore(
-    core0Task,    // Hàm thực thi lõi CPU 0
-    "Core 0 Task", // Tên luồng
-    10000,        // Kích thước ngăn xếp (bytes)
-    NULL,         // Tham số truyền vào hàm thực thi
-    1,            // Độ ưu tiên luồng
-    NULL,         // Task handle
-    0             // Lõi CPU (0 hoặc 1)
-);
+// xTaskCreatePinnedToCore(
+//     core0Task,    // Hàm thực thi lõi CPU 0
+//     "Core 0 Task", // Tên luồng
+//     10000,        // Kích thước ngăn xếp (bytes)
+//     NULL,         // Tham số truyền vào hàm thực thi
+//     1,            // Độ ưu tiên luồng
+//     NULL,         // Task handle
+//     0             // Lõi CPU (0 hoặc 1)
+// );
   backlightOFF();
  pinMode(TX_LEDPin, OUTPUT);
  digitalWrite(TX_LEDPin, LOW);
@@ -309,39 +279,34 @@ xTaskCreatePinnedToCore(
 
 void loop() {
 
-
-
-
 #ifdef enableTX_LED
   /*ESP Activity LED */
   digitalWrite(TX_LEDPin, HIGH);    // turn the LED off HIGH(OFF) LOW (ON)
 #endif
   //-----------------------------
-
   /*Mode Button, moved to its own tab*/
   button_Modes();
 //rainbow(5);
 //rainbowCycle(2);
 }
-
 /* END of Main Loop */
 
 // Hàm thực thi cho tác vụ trên lõi CPU 1
-void core0Task(void *parameter) {
-  while (1) {
-  uint16_t i, j;
+// void core0Task(void *parameter) {
+//   while (1) {
+//   uint16_t i, j;
 
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
-    }
-    pixels.show();
-    delay(2);
-  }
-     //Serial.println("Core 1 is running...");
-    // delay(1000); // Độ trễ 1 giây
-  }
-}
+//   for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+//     for(i=0; i< pixels.numPixels(); i++) {
+//       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+//     }
+//     pixels.show();
+//     delay(2);
+//   }
+//      //Serial.println("Core 1 is running...");
+//     // delay(1000); // Độ trễ 1 giây
+//   }
+// }
 
 void rainbow(uint8_t wait) {
   uint16_t i, j;
@@ -529,7 +494,6 @@ void backlightOFF () {
 
 #endif
 //----------------------------- Splash Screens --------------------------------
-
 void splashScreen() {
 
   /* Initial Boot Screen, */
@@ -598,74 +562,19 @@ tft.setRotation(1);
 
 #endif
 
-// #ifdef splashScreenLS
 
-//   /*  Baud Rate */
-//   tft.setFont(); // Set Default Adafruit GRFX Font
-//   tft.setTextColor(ILI9341_WHITE);
-//   tft.setTextSize(1);
-//   tft.setCursor(140 - 130, 12);
-//   tft.print("Baud: ");
-//   tft.print (baudRate);
-//   tft.print(" bps ");
+ //enable_NeopixelGauges()
 
-//   /* Set version */
-//   tft.setFont(); // Set Default Adafruit GRFX Font
-//   tft.setTextColor(ILI9341_WHITE);
-//   tft.setTextSize(1);
-//   tft.setCursor(140 - 130, 3);
-//   tft.print("TFT: v");
-//   tft.print (CODE_VERS);
-
-// #else
-
-//   /*  Baud Rate */
-//   tft.setFont(); // Set Default Adafruit GRFX Font
-//   tft.setTextColor(ILI9341_WHITE);
-//   tft.setTextSize(1);
-//   tft.setCursor(110, 288);
-//   tft.print("Baud: ");
-//   tft.print (baudRate);
-//   tft.print(" bps ");
-
-//   /* Set version */
-//   tft.setFont(); // Set Default Adafruit GRFX Font
-//   tft.setTextColor(ILI9341_WHITE);
-//   tft.setTextSize(1);
-//   tft.setCursor(110, 300);
-//   tft.print("TFT: v");
-//   tft.print (CODE_VERS);
-
-// #endif
-
-  // //-------------------------------------------------------------------
-  // //tft.setTextColor(ILI9341_WHITE);
-  // tft.setFont(); // Set Default Adafruit GRFX Font
-
-  // //tft.setTextSize(1);
-
-  // //tft.setCursor(10, 305);
-  // //tft.setTextColor(ILI9341_WHITE);
-  // //tft.print("If using USB Serial? Disconnect BT!!!");
-
-   backlightON();
-
-   FeatureSet_Indicator2(); // Display Icons for enabled features
-
-   delay(5000);
-
-#ifdef enable_NeopixelGauges
 
 #ifdef enable_BT
-  allNeoPixelsBLUE();
+  allNeoPixelsRED();
 #else
   allNeoPixelsRED();
 #endif
 
-#endif
 
   //tft.fillScreen(ILI9341_BLACK);
-  backlightOFF();// Hide the Screen while drawing
+backlightOFF();// Hide the Screen while drawing
 
 
 #ifdef batteryMonitor
