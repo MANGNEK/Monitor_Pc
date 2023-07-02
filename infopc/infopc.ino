@@ -240,8 +240,9 @@ boolean stringComplete = false;
 
 
 void setup() {
-
-
+  /* Set up PINs*/
+  //pinMode(6,OUTPUT);
+  pinMode(mode_Button, INPUT_PULLUP);
 //#ifdef enable_BT
   //btStart();
   SerialBT.begin(device_BT); //Bluetooth device name
@@ -258,9 +259,7 @@ void setup() {
   pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
 
-  /* Set up PINs*/
 
-  pinMode(mode_Button, INPUT_PULLUP);
 
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT); // declare backlight pin to be an output:
@@ -308,7 +307,7 @@ xTaskCreatePinnedToCore(
 /* End of Set up */
 
 void loop() {
-
+//digitalWrite(10,HIGH);
 
 
 

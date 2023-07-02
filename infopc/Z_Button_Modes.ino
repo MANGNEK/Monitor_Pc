@@ -5,9 +5,7 @@
 void button_Modes() {
 
   int enc_buttonVal = digitalRead(mode_Button);
-  if (enc_buttonVal == LOW)
-
-  {
+  if (enc_buttonVal == LOW){
     delay(debounceButton); // Debounce Button
     display_Button_counter ++;
 
@@ -18,8 +16,6 @@ void button_Modes() {
     /* Reset count if over max mode number, */
     if (display_Button_counter == 5) // Number of screens available when button pressed
     {
-      tft.fillScreen(ILI9341_BLACK);
-
       display_Button_counter = 0;
     }
   }

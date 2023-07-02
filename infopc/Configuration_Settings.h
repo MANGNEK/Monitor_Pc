@@ -46,7 +46,7 @@
 #define enable_BT              // Use baud of 9600, enable only Bluetooth Classic serial connection
 
 /* Enable the built in LED blinking when transmitting, saves power when using battery if disabled,*/
-#define enableTX_LED //
+//#define enableTX_LED //
 int TX_LED_Delay = 0; // TX blink delay
 
 
