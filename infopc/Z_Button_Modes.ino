@@ -19,7 +19,9 @@ void button_Modes() {
       display_Button_counter = 0;
     }
   }
+
   else
+
     /* Change Mode */
     switch (display_Button_counter) {
 

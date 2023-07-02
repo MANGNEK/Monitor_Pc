@@ -1,3 +1,39 @@
+/*
+      ____  __  _____  ______   ______________  ___________    __________________
+     / __ \/ / / /   |/_  __/  / ___/_  __/   |/_  __/ ___/   /_  __/ ____/_  __/
+    / /_/ / /_/ / /| | / /_____\__ \ / / / /| | / /  \__ \     / / / /_    / /
+   / ____/ __  / ___ |/ /_____/__/ // / / ___ |/ /  ___/ /    / / / __/   / /
+  /_/   /_/ /_/_/  |_/_/     /____//_/ /_/  |_/_/  /____/    /_/ /_/     /_//*
+
+    ___ ___  _  _ ___ ___ ___ _   _ ___    _ _____ ___ ___  _  _
+   / __/ _ \| \| | __|_ _/ __| | | | _ \  /_\_   _|_ _/ _ \| \| |
+  | (_| (_) | .` | _| | | (_ | |_| |   / / _ \| |  | | (_) | .` |
+   \___\___/|_|\_|_| |___\___|\___/|_|_\/_/ \_\_| |___\___/|_|\_|
+
+  uVolume, GNATSTATS OLED, PHATSTATS TFT PC Performance Monitor & HardwareSerialMonitor Windows Client
+  Rupert Hirst © 2016 - 2023 http://tallmanlabs.com http://runawaybrainz.blogspot.com/
+  https://github.com/koogar/Phat-Stats  https://hackaday.io/project/19018-phat-stats-pc-performance-tft-display
+
+  Gnat-Stats & Phat-Stats are optimised for desktop CPU's with dedicated graphics cards,
+  You may get weird results on integrated GPU's (iGPU's) on laptops.*/
+
+//------------------------------- BT Limitations --------------------------------------
+
+/*If BT is enabled you can not use HardwareSerialMonitor with USB serial, even though it is visible.
+  You can still upload new code through the Arduino IDE as normal.
+
+  Currently when using BT you only have to connect the device to Windows, no BT pairing is needed.
+  When disconnected, you will need to manualy reconnect in HardwareSerialMonitor by clicking
+  on the correct COM port “Standard Serial over Bluetooth link”.
+
+  Note: Once connected, two “Standard Serial over Bluetooth Classic link” will be visible
+  one is Send, the other is Receive.
+  When you know the correct port for Send you can disable the other in Device Manager
+  so it does not to show up in HardwareSerialMonitor.*/
+
+//--------------------------- ESP32 BT Board Windows ID -----------------------------------
+
+
 #define  LOLIN_D32
 //#define  LOLIN32_LITE
 
@@ -128,7 +164,7 @@ String set_GPUram = "256";
 //-------------------------------- NeoPixel Modes -------------------------------------
 #define NUM_PIXELS  8
 /* If  NeoBrightness = 0 Phat-Stats will start with no NeoPixels lit. Turn the Rotary Encoder to turn on the NeoPixels, */
-int NeoBrightness   = 250;           // Global start up brightness
+int NeoBrightness   = 10;           // Global start up brightness
 
 /* Uncomment only one of the below*/
 //#define enable_NeopixelGauges     // NeoPixel ring bargraph example
