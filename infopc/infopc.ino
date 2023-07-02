@@ -152,9 +152,15 @@ void loop()
   #ifdef enableTX_LED
   digitalWrite(TX_LEDPin, HIGH);    // turn the LED off HIGH(OFF) LOW (ON)
   #endif
-
+    if(activeConn)
+    {
+      allNeoPixelsGREEN();
+      allNeoPixelsOff();
+    }else
+    {
+      allNeoPixelsBLUE();
+    }
     button_Modes();
-    allNeoPixelsGREEN();
 }
 
 uint32_t Wheel(byte WheelPos) {
@@ -287,7 +293,7 @@ void backlightOFF () {
 //----------------------------- Splash Screens --------------------------------
 void splashScreen() {
   /* Initial Boot Screen, */
-  allNeoPixelsOff();
+  allNeoPixelsBLUE();
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
   tft.setFont(&Org_01);
   tft.fillScreen(ILI9341_BLACK);
