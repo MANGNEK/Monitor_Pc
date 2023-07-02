@@ -1,70 +1,3 @@
-/*
-  uVolume, GNATSTATS OLED, PHATSTATS TFT PC Performance Monitor & HardwareSerialMonitor Windows Client
-  Rupert Hirst © 2016 - 2023 http://tallmanlabs.com http://runawaybrainz.blogspot.com/
-  https://github.com/koogar/Phat-Stats  https://hackaday.io/project/19018-phat-stats-pc-performance-tft-display
-
-
-  WARNING!!!last successful compile espressif v2.0.5
-  if your compile fails (analogWriteResolution) uninstall in the IDE boards manager down to the above version
-  https://github.com/espressif/arduino-esp32/blob/master/docs/arduino-ide/boards_manager.md
-
-  Board Manager ESP32
-  -------------------
-  Click on File > Preference, and fill Additional Boards Manager URLs with the url below:
-  https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-
-
-
-  Libraries
-  ---------
-  Adafruit Neopixel
-  https://github.com/adafruit/Adafruit_NeoPixel
-
-  Adafruit GFX Library
-  https://github.com/adafruit/Adafruit-GFX-Library
-
-  Adafruit ILI9341
-  https://github.com/adafruit/Adafruit_ILI9341
-
-  Rotary encoder
-  https://github.com/koogar/ErriezRotaryEncoderFullStep
-
-
-  WARNING!!!last successful compile espressif v2.0.5
-  if your compile fails (analogWriteResolution) uninstall in the IDE boards manager down to the above version
-
-  ESP32 analogueWrite Function
-  https://github.com/ERROPiX/ESP32_AnalogWrite
-
-  Battery Monitor by Alberto Iriberri Andrés
-  https://github.com/pangodream/18650CL
-
-  Hookup Guide
-  https://runawaybrainz.blogspot.com/2021/03/phat-stats-ili9341-tft-display-hook-up.html
-
-
-
-  Library Working Version Checker 18/04/2023
-  (some libraries may not be used in this sketch)
-  ------------------------------------------------
-  Arduino IDE          v1.8.19
-  espressif (ESP32)    v2.0.5 (v2.08 = ESP32_AnalogWrite compile error)
-  ------------------------------------------------
-  ESP32_AnalogWrite    v0.2    (Current 04/2023)
-  Adafruit BusIO       v1.14.0 (Current 04/2023
-  Adafruit_GFX         v1.11.5 (Current 04/2023)
-  Adafruit_NeoPixel    v1.11.0 (Current 04/2023)
-  Adafruit ILI9341     v1.5.12 (Current 04/2023)
-  Adafruit SH110X      v2.1.8  (Current 04/2023)
-  Adafruit SD1306      v2.5.7  (Current 04/2023)
-  HID-Project          v2.8.4  (Current 04/2023)
-  IRremote             v4.1.2  (Current 04/2023)
-
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-               SEE CONFIGURATION TAB FIRST, FOR QUICK SETTINGS!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-*/
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -73,17 +6,16 @@
 #include <analogWrite.h>
 #include <TML_ErriezRotaryFullStep.h>
 
-#include "Configuration_Settings.h" // load settings
+#include "Configuration_Settings.h" 
 #include "Z_Bitmaps.h"
 
-#include "BluetoothSerial.h" //https://www.electronicshub.org/esp32-bluetooth-tutorial/
+#include "BluetoothSerial.h" 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include "MCUFRIEND_kbv.h"
 #include <Adafruit_NeoPixel.h>
-#include <Pangodream_18650_CL.h> // Copyright (c) 2019 Pangodream
+#include <Pangodream_18650_CL.h>
 
-//------------------------- CRT Style Colour Profiles ----------------------
 #ifdef  RETRO_MONO
 #define ILI9341_YELLOW      0xFFFF //ILI9341_WHITE
 #define ILI9341_WHITE       0xFFFF //ILI9341_WHITE
@@ -95,7 +27,6 @@
 #define ILI9341_GREY        0x7BEF //ILI9341_GREY 
 #define ILI9341_LIGHT_GREY  0xC618 //ILI9341_LIGHT_GREY
 #endif
-
 
 #ifdef  RETRO_AMBER
 #define ILI9341_YELLOW      0xFFE0 //ILI9341_YELLOW
@@ -158,18 +89,11 @@
 #define ILI9341_MAROON      0x7800
 #define ILI9341_PURPLE      0x780F
 #define ILI9341_OLIVE       0x7BE0
-//--------------------------------
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled!
 #endif
 
-/*
-  Battery Monitor   Voltage divider (GND ---[100K]--- (Pin34 ADC) ----[100k]--- BATT+) 3.2v to 4.2v Range
-  --------------------
-  Battery Monitor = 34
-  ==========================================================================================================
-*/
 #ifdef batteryMonitor
 /* Battery Monitor Settings*/
 #define ADC_PIN 35        //!< ADC pin used, default is GPIO34 - ADC1_6 Voltage divider (2* 100K)
@@ -177,158 +101,61 @@
 #define READS 20
 Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #endif
-//---------------------------------------------------------------------------------------
-
 #define NEOPIN      5
-#define NUM_PIXELS  8 // moved to CFG
+#define NUM_PIXELS  8 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-//Adafruit_NeoPixel pixels = Adafruit_NeoPixel(8, PIN, NEO_GRB + NEO_KHZ800);
-
-//-----------------------------------------------------------------------------
-/* Encoder Button pin*/
+pixels.begin();   
+pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
 int mode_Button     = 34; 
 int display_Button_counter = 0;
-/* Screen TFT backlight Pin */
 int TFT_backlight_PIN = 0;
-/* Encoder TFT Brightness*/ //Reserved!!! not supported on ESP32 Reserved
-//volatile int brightness_count = 150; // Start Up PWM Brightness, moved to CFG!!!
-int brightness_countLast      = 0;   // Store Last PWM Value
-//-----------------------------------------------------------------------------
-/* Display screen rotation  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)*/
-int ASPECT = 0; //Do not adjust,
-/* More Display stuff*/
+int brightness_countLast = 0;   
+int ASPECT = 0; 
 int displayDraw = 0;
-//-----------------------------------------------------------------------------
-/* Timer for active connection to host*/
 boolean activeConn = false;
 long lastActiveConn = 0;
 boolean bootMode = true;
-/* Vars for serial input*/
 String inputString = "";
 boolean stringComplete = false;
-
-BluetoothSerial SerialBT;    // Bluetooth Classic, not BLE
+BluetoothSerial SerialBT;   
 MCUFRIEND_kbv tft;
 
 void setup() {
-//#ifdef enable_BT
-  //btStart();
-  SerialBT.begin(device_BT); //Bluetooth device name
-//#else //USB
-
-  Serial.begin(baudRate);  //  USB Serial Baud Rate
-//#endif
-
-  inputString.reserve(220); // String Buffer
-
-
-  /* Set up the NeoPixel*/
-  pixels.begin();    // This initializes the NeoPixel library.
-  pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
+  SerialBT.begin(device_BT); 
+  Serial.begin(baudRate); 
+  inputString.reserve(220); 
   pixels.show(); // Turn off all Pixels
-
-  /* Set up PINs*/
-
   pinMode(mode_Button, INPUT_PULLUP);
-
 #ifdef fixedBacklight
-  pinMode(TFT_backlight_PIN, OUTPUT); // declare backlight pin to be an output:
+  pinMode(TFT_backlight_PIN, OUTPUT); 
 #else
-  // Set resolution for a specific pin
-  analogWriteResolution(TFT_backlight_PIN, 12); //ESP32 only
+  analogWriteResolution(TFT_backlight_PIN, 12);
 #endif
-
 #ifdef enableTX_LED
-  pinMode(TX_LEDPin, OUTPUT); //  Builtin LED /  HIGH(OFF) LOW (ON)
+  pinMode(TX_LEDPin, OUTPUT); 
 #endif
-
-
-// xTaskCreatePinnedToCore(
-//     core0Task,    // Hàm thực thi lõi CPU 0
-//     "Core 0 Task", // Tên luồng
-//     10000,        // Kích thước ngăn xếp (bytes)
-//     NULL,         // Tham số truyền vào hàm thực thi
-//     1,            // Độ ưu tiên luồng
-//     NULL,         // Task handle
-//     0             // Lõi CPU (0 hoặc 1)
-// );
-  backlightOFF();
+backlightOFF();
  pinMode(TX_LEDPin, OUTPUT);
  digitalWrite(TX_LEDPin, LOW);
-  /* TFT SETUP */
-
-  delay(200); // Give the micro time to initiate the SPi bus
+  delay(200); 
   int ID = tft.readID();
-  tft.begin(ID); //ILI9341
+  tft.begin(ID); 
   tft.setRotation(ASPECT);// Rotate the display :  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
-
-  /* stops text wrapping*/
   tft.setTextWrap(false); // Stop  "Loads/Temps" wrapping and corrupting static characters
-
-  /* Clear Screen*/
   tft.setTextColor(ILI9341_WHITE);
   tft.fillScreen(ILI9341_BLACK);
-
   splashScreen();
-  
-
 }
 
-/* End of Set up */
-
-void loop() {
-
-#ifdef enableTX_LED
-  /*ESP Activity LED */
+void loop()
+ {
+  #ifdef enableTX_LED
   digitalWrite(TX_LEDPin, HIGH);    // turn the LED off HIGH(OFF) LOW (ON)
-#endif
-  //-----------------------------
-  /*Mode Button, moved to its own tab*/
-  button_Modes();
-//rainbow(5);
-//rainbowCycle(2);
+  #endif
+
+    button_Modes();
 }
-/* END of Main Loop */
 
-// Hàm thực thi cho tác vụ trên lõi CPU 1
-// void core0Task(void *parameter) {
-//   while (1) {
-//   uint16_t i, j;
-
-//   for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-//     for(i=0; i< pixels.numPixels(); i++) {
-//       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
-//     }
-//     pixels.show();
-//     delay(2);
-//   }
-//      //Serial.println("Core 1 is running...");
-//     // delay(1000); // Độ trễ 1 giây
-//   }
-// }
-
-void rainbow(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256; j++) {
-    for(i=0; i<pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel((i+j) & 255));
-    }
-    pixels.show();
-    delay(wait);
-  }
-}
-void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
-
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
-    }
-    pixels.show();
-    delay(wait);
-  }
-}
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
@@ -341,7 +168,6 @@ uint32_t Wheel(byte WheelPos) {
   WheelPos -= 170;
   return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
-//-----------------------------  NeoPixels RGB  -----------------------------------
 void allNeoPixelsOff() {
   for ( int i = 0; i < NUM_PIXELS; i++ ) {
     pixels.setPixelColor(i, 0, 0, 0 );
@@ -369,14 +195,7 @@ void allNeoPixelsBLUE() {
   }
   pixels.show();
 }
-//-----------------------------  Serial Events -------------------------------
-/*
-  SerialEvent occurs whenever a new data comes in the hardware serial RX. This
-  routine is run between each time loop() runs, so using delay inside loop can
-  delay response. Multiple bytes of data may be available.
-*/
 
-/* BlueTooth */
 void serialBTEvent() {
   while (SerialBT.available()) {
 
@@ -399,33 +218,6 @@ void serialBTEvent() {
     }
   }
 }
-
-
-/* USB Serial*/
-void serialEvent() {
-  while (Serial.available()) {
-
-    char inChar = (char)Serial.read();
-    //Serial.print(inChar); // Debug Incoming Serial
-
-    // add it to the inputString:
-    inputString += inChar;
-    // if the incoming character has '|' in it, set a flag so the main loop can do something about it:
-    if (inChar == '|') {
-      stringComplete = true;
-
-      delay(Serial_eventDelay);   //delay screen event to stop screen data corruption
-
-#ifdef enableTX_LED
-      /* Serial Activity LED*/
-      digitalWrite(TX_LEDPin, LOW);   // turn the LED off HIGH(OFF) LOW (ON)
-#endif
-
-    }
-  }
-}
-
-
 //----------------------------- ActivityChecker  -------------------------------
 void activityChecker() {
 
@@ -466,11 +258,8 @@ void activityChecker() {
   }
 
 }
-
-
-
 //----------------------------- TFT Backlight  -------------------------------
-#ifdef fixedBacklight //
+#ifdef fixedBacklight 
 void backlightON () {
   digitalWrite(TFT_backlight_PIN, HIGH);
 
@@ -494,21 +283,16 @@ void backlightOFF () {
 #endif
 //----------------------------- Splash Screens --------------------------------
 void splashScreen() {
-
   /* Initial Boot Screen, */
-
   allNeoPixelsOff();
-
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
-
   tft.setFont(&Org_01);
   tft.fillScreen(ILI9341_BLACK);
   tft.drawRoundRect  (0, 0  , 240, 400, 8,    ILI9341_RED);
-
-#ifdef splashScreenLS // Quick landscape hack job, also in FeatureSet
+  #ifdef splashScreenLS // Quick landscape hack job, also in FeatureSet
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
-#endif
-tft.setRotation(1);
+  #endif
+  tft.setRotation(1);
 
   tft.drawBitmap(44, 20, HSM_BG_BMP,  142, 128, ILI9341_WHITE);
   tft.drawBitmap(44, 20, HSM_BG2_BMP, 142, 128, ILI9341_RED);
@@ -533,7 +317,7 @@ tft.setRotation(1);
   tft.print("HOAI NAM ");
 
 
-#ifdef batteryMonitor
+  #ifdef batteryMonitor
   // Battery Level Indicator on Boot Screenn
   //-------------------------------------------------------------
   if (BL.getBatteryVolts() <= 3.4 ) {
@@ -547,87 +331,53 @@ tft.setRotation(1);
     tft.print(BL.getBatteryVolts()); tft.print("v");
 
   } else {
-
-    //-------------------------------------------------------------
-
-   // tft.drawBitmap(170, 10, BATTERY_BMP, 60, 20, ILI9341_GREEN);
-            tft.drawBitmap(170, 10, BT_BMP, 36, 36, ILI9341_GREEN);
-
+    tft.drawBitmap(170, 10, BT_BMP, 36, 36, ILI9341_GREEN);
     tft.setTextSize(2);
     tft.setCursor(178, 23);
     tft.setTextColor(ILI9341_BLACK);
     tft.print(BL.getBatteryVolts()); tft.print("v");
   }
+  #endif
 
-#endif
-
-
- //enable_NeopixelGauges()
-
-
-#ifdef enable_BT
-  allNeoPixelsBLUE();
-#else
-  allNeoPixelsRED();
-#endif
+  #ifdef enable_BT
+    allNeoPixelsBLUE();
+  #else
+    allNeoPixelsRED();
+  #endif
+  backlightOFF();
 
 
-  //tft.fillScreen(ILI9341_BLACK);
-backlightOFF();// Hide the Screen while drawing
+  #ifdef batteryMonitor
+    // Show Battery Level Indicator on waiting for data screen
+    if (BL.getBatteryVolts() <= 3.4 ) {
+    // tft.drawBitmap(33 + 40, 280, BATTERY_BMP, 60, 20, ILI9341_RED);
+              tft.drawBitmap(33+40, 280, BT_BMP, 36, 36, ILI9341_RED);
 
 
-#ifdef batteryMonitor
-  // Show Battery Level Indicator on waiting for data screen
+      tft.setCursor(46 + 40, 286 ); // (Left/Right, UP/Down)
+      tft.setTextSize(1);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.print(BL.getBatteryVolts()); tft.print("v");
+      tft.setTextColor(ILI9341_WHITE);
+      tft.setTextSize(2);
+      tft.setCursor(100 + 40, 283 ); // (Left/Right, UP/Down)
+      tft.print(BL.getBatteryChargeLevel());
+      tft.print("% ");
 
-  if (BL.getBatteryVolts() <= 3.4 ) {
-   // tft.drawBitmap(33 + 40, 280, BATTERY_BMP, 60, 20, ILI9341_RED);
-            tft.drawBitmap(33+40, 280, BT_BMP, 36, 36, ILI9341_RED);
+    } else {
 
+    // tft.drawBitmap(33 + 40, 280, BATTERY_BMP, 60, 20, ILI9341_GREEN);
+          tft.drawBitmap(33+40, 280, BT_BMP, 36, 36, ILI9341_RED);
 
-    tft.setCursor(46 + 40, 286 ); // (Left/Right, UP/Down)
-    tft.setTextSize(1);
-    tft.setTextColor(ILI9341_BLACK);
-    tft.print(BL.getBatteryVolts()); tft.print("v");
-    tft.setTextColor(ILI9341_WHITE);
-    tft.setTextSize(2);
-    tft.setCursor(100 + 40, 283 ); // (Left/Right, UP/Down)
-    tft.print(BL.getBatteryChargeLevel());
-    tft.print("% ");
-
-  } else {
-
-   // tft.drawBitmap(33 + 40, 280, BATTERY_BMP, 60, 20, ILI9341_GREEN);
-        tft.drawBitmap(33+40, 280, BT_BMP, 36, 36, ILI9341_RED);
-
-    tft.setCursor(46 + 40, 286 ); // (Left/Right, UP/Down)
-    tft.setTextSize(1);
-    tft.setTextColor(ILI9341_BLACK);
-    tft.print(BL.getBatteryVolts()); tft.print("v");
-    tft.setTextColor(ILI9341_WHITE);
-    tft.setTextSize(2);
-    tft.setCursor(100 + 40, 283 ); // (Left/Right, UP/Down)
-    tft.print(BL.getBatteryChargeLevel());
-    tft.print("% ");
-  }
-#endif
-
-// #ifdef splashScreenLS // Quick landscape hack job, also in FeatureSet
-//   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
-// #endif
-
-// #else // USB
-//   tft.drawRoundRect  (0, 0  , 240, 320, 8,    ILI9341_RED);
-//   tft.drawBitmap(82, 62, WaitingDataBMP_USB, 76, 190, ILI9341_RED);
-// #endif
-
-// #ifdef enable_BT
-//   tft.drawRoundRect  (0, 0  , 240, 400, 8,    ILI9341_RED);
-//   tft.drawBitmap(82, 62, WaitingDataBMP_BT,  76, 190, ILI9341_BLUE);
-// #endif
-
-  // backlightON();
-  // delay(2000);
-  // backlightOFF();// Hide the Screen while drawing
-  // tft.fillScreen(ILI9341_BLACK);
-
+      tft.setCursor(46 + 40, 286 ); // (Left/Right, UP/Down)
+      tft.setTextSize(1);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.print(BL.getBatteryVolts()); tft.print("v");
+      tft.setTextColor(ILI9341_WHITE);
+      tft.setTextSize(2);
+      tft.setCursor(100 + 40, 283 ); // (Left/Right, UP/Down)
+      tft.print(BL.getBatteryChargeLevel());
+      tft.print("% ");
+    }
+  #endif
 }
