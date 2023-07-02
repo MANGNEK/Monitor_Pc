@@ -328,18 +328,9 @@ void loop() {
 // Hàm thực thi cho tác vụ trên lõi CPU 1
 void core0Task(void *parameter) {
   while (1) {
-  uint16_t i, j;
-
-  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
-    for(i=0; i< pixels.numPixels(); i++) {
-      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
-    }
-    pixels.show();
-    delay(2);
+    rainbowCycle(2);
   }
-     //Serial.println("Core 1 is running...");
-    // delay(1000); // Độ trễ 1 giây
-  }
+  
 }
 
 void rainbow(uint8_t wait) {
