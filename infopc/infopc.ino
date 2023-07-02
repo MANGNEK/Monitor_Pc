@@ -104,11 +104,10 @@ Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #define NEOPIN      5
 #define NUM_PIXELS  8 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-pixels.begin();   
-pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
+
 int mode_Button     = 34; 
 int display_Button_counter = 0;
-int TFT_backlight_PIN = 0;
+int TFT_backlight_PIN = 27;
 int brightness_countLast = 0;   
 int ASPECT = 0; 
 int displayDraw = 0;
@@ -120,17 +119,48 @@ boolean stringComplete = false;
 BluetoothSerial SerialBT;   
 MCUFRIEND_kbv tft;
 
+
+// Hàm thực thi cho tác vụ trên lõi CPU 1
+void core0Task(void *parameter) {
+
+  while (1) {
+    Serial.print("Core000");
+    switch (display_Button_counter){
+      case 0: // 1st SCREEN
+        rainbowCycle(2);
+        break;
+      case 1: // 2nd SCREEN
+        rainbow(2);
+        break;
+      case 2: // 3nd SCREEN
+        allNeoPixelsRED();
+        break;
+      case 3: // 4nd SCREEN
+        allNeoPixelsBLUE();
+        break;
+      case 4: // 5th SCREEN
+        rainbowCycle(2);
+       break;
+
+    }
+  }}
 void setup() {
   SerialBT.begin(device_BT); 
-  Serial.begin(baudRate); 
-  inputString.reserve(220); 
+  Serial.begin(baudRate);
+
+  inputString.reserve(220);
+
+  pixels.begin();   
+  pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
+  
   pinMode(mode_Button, INPUT_PULLUP);
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT); 
 #else
   analogWriteResolution(TFT_backlight_PIN, 12);
 #endif
+
 #ifdef enableTX_LED
   pinMode(TX_LEDPin, OUTPUT); 
 #endif
@@ -145,6 +175,15 @@ backlightOFF();
   tft.setTextColor(ILI9341_WHITE);
   tft.fillScreen(ILI9341_BLACK);
   splashScreen();
+  xTaskCreatePinnedToCore(
+    core0Task,    // Hàm thực thi lõi CPU 0
+    "Core 0 Task", // Tên luồng
+    10000,        // Kích thước ngăn xếp (bytes)
+    NULL,         // Tham số truyền vào hàm thực thi
+    1,            // Độ ưu tiên luồng
+    NULL,         // Task handle
+    0             // Lõi CPU (0 hoặc 1)
+);
 }
 
 void loop()
@@ -153,9 +192,30 @@ void loop()
   digitalWrite(TX_LEDPin, HIGH);    // turn the LED off HIGH(OFF) LOW (ON)
   #endif
 
-    button_Modes();
+  button_Modes();
 }
+void rainbow(uint8_t wait) {
+  uint16_t i, j;
 
+  for(j=0; j<256; j++) {
+    for(i=0; i<pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+  }
+}
+void rainbowCycle(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+    for(i=0; i< pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+  }
+}
 uint32_t Wheel(byte WheelPos) {
   WheelPos = 255 - WheelPos;
   if(WheelPos < 85) {
