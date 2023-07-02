@@ -104,8 +104,6 @@ Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #define NEOPIN      5
 #define NUM_PIXELS  8 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-pixels.begin();   
-pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
 int mode_Button     = 34; 
 int display_Button_counter = 0;
 int TFT_backlight_PIN = 0;
@@ -124,6 +122,8 @@ void setup() {
   SerialBT.begin(device_BT); 
   Serial.begin(baudRate); 
   inputString.reserve(220); 
+  pixels.begin();   
+  pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
   pinMode(mode_Button, INPUT_PULLUP);
 #ifdef fixedBacklight
@@ -154,6 +154,7 @@ void loop()
   #endif
 
     button_Modes();
+    allNeoPixelsGREEN();
 }
 
 uint32_t Wheel(byte WheelPos) {
@@ -222,11 +223,13 @@ void serialBTEvent() {
 void activityChecker() {
 
   if (millis() - lastActiveConn > lastActiveDelay)
-
+  {   
     activeConn = false;
+  }
   else
+  {
     activeConn = true;
-
+  }
   if (!activeConn) {
 
 
@@ -338,15 +341,6 @@ void splashScreen() {
     tft.print(BL.getBatteryVolts()); tft.print("v");
   }
   #endif
-
-  #ifdef enable_BT
-    allNeoPixelsBLUE();
-  #else
-    allNeoPixelsRED();
-  #endif
-  backlightOFF();
-
-
   #ifdef batteryMonitor
     // Show Battery Level Indicator on waiting for data screen
     if (BL.getBatteryVolts() <= 3.4 ) {
