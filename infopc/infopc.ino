@@ -65,7 +65,6 @@
                SEE CONFIGURATION TAB FIRST, FOR QUICK SETTINGS!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
-#define CODE_VERS  "3.1.6.BT.ADV" 
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -212,9 +211,6 @@ BluetoothSerial SerialBT;    // Bluetooth Classic, not BLE
 MCUFRIEND_kbv tft;
 
 void setup() {
-  /* Set up PINs*/
-  //pinMode(6,OUTPUT);
-  pinMode(mode_Button, INPUT_PULLUP);
 //#ifdef enable_BT
   //btStart();
   SerialBT.begin(device_BT); //Bluetooth device name
@@ -231,7 +227,9 @@ void setup() {
   pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
 
+  /* Set up PINs*/
 
+  pinMode(mode_Button, INPUT_PULLUP);
 
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT); // declare backlight pin to be an output:
@@ -568,7 +566,7 @@ tft.setRotation(1);
 
 
 #ifdef enable_BT
-  allNeoPixelsRED();
+  allNeoPixelsBLUE();
 #else
   allNeoPixelsRED();
 #endif
