@@ -24,7 +24,7 @@ void button_Modes() {
     switch (display_Button_counter) {
 
       case 0: // 1st SCREEN
-        ASPECT=2;
+        ASPECT=0;
         Display_Port_Batt();
 
         break;
@@ -38,7 +38,7 @@ void button_Modes() {
 
       case 2: // 3nd SCREEN
         // Display_LS_Batt_180();
-        ASPECT=0;
+        ASPECT=2;
         Display_Port_Batt();
 
         break;

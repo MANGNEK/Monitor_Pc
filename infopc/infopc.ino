@@ -102,14 +102,16 @@
 Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #endif
 #define NEOPIN      5
-#define NUM_PIXELS  8 
+#define NUM_PIXELS  9 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-int mode_Button     = 34; 
+int volume=34;
+int mode_Button     = 2; 
 int display_Button_counter = 0;
 int TFT_backlight_PIN = 27;
 int brightness_countLast = 0;   
 int ASPECT = 0; 
 int displayDraw = 0;
+int value_volume=0;
 boolean activeConn = false;
 long lastActiveConn = 0;
 boolean bootMode = true;
@@ -122,8 +124,9 @@ MCUFRIEND_kbv tft;
 
 void task1(void *parameter) {
   while (1) {
-    Serial.print("Core000  "); 
-    Serial.print(display_Button_counter);
+    //Serial.print("Core000  "); 
+     //int value_volume=analogRead(volume)/410;
+    //Serial.println(value_volume);
     switch (display_Button_counter){
       case 0: // 1st SCREEN
         rainbowCycle(2);
@@ -157,6 +160,7 @@ void setup() {
   pixels.show(); // Turn off all Pixels
   
   pinMode(mode_Button, INPUT_PULLUP);
+  pinMode(volume, INPUT);
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT); 
 #else
@@ -195,6 +199,8 @@ void loop()
     // {
     //   allNeoPixelsBLUE();
     // }
+    int value_volume=analogRead(volume)/200;
+    //Serial.println(value_volume);
     button_Modes();
 }
 void rainbow(uint8_t wait) {
@@ -216,6 +222,9 @@ void rainbowCycle(uint8_t wait) {
       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
     }
     pixels.show();
+    value_volume=analogRead(volume);
+    //Serial.println(value_volume);
+    pixels.setBrightness(value_volume/16);
     delay(wait);
   }
 }
@@ -263,7 +272,7 @@ void serialBTEvent() {
   while (SerialBT.available()) {
 
     char inChar = (char)SerialBT.read();
-    //Serial.print(inChar); // Debug Incoming Serial
+    Serial.print(inChar); // Debug Incoming Serial
 
     // add it to the inputString:
     inputString += inChar;
