@@ -104,7 +104,6 @@ Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #define NEOPIN      5
 #define NUM_PIXELS  8 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
-
 int mode_Button     = 34; 
 int display_Button_counter = 0;
 int TFT_backlight_PIN = 27;
@@ -120,36 +119,39 @@ BluetoothSerial SerialBT;
 MCUFRIEND_kbv tft;
 
 
-// Hàm thực thi cho tác vụ trên lõi CPU 1
-void core0Task(void *parameter) {
 
+void task1(void *parameter) {
   while (1) {
-    Serial.print("Core000");
+    Serial.print("Core000  "); 
+    Serial.print(display_Button_counter);
     switch (display_Button_counter){
       case 0: // 1st SCREEN
         rainbowCycle(2);
-        break;
+         break;
       case 1: // 2nd SCREEN
-        rainbow(2);
+        allNeoPixelsBLUE();    
         break;
+   
       case 2: // 3nd SCREEN
-        allNeoPixelsRED();
+        rainbowCycle(2);
         break;
+
       case 3: // 4nd SCREEN
-        allNeoPixelsBLUE();
+        allNeoPixelsBLUE();  
         break;
+    
       case 4: // 5th SCREEN
         rainbowCycle(2);
-       break;
-
+        break;
     }
-  }}
+  }
+}
+
+
 void setup() {
   SerialBT.begin(device_BT); 
-  Serial.begin(baudRate);
-
-  inputString.reserve(220);
-
+  Serial.begin(baudRate); 
+  inputString.reserve(220); 
   pixels.begin();   
   pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
@@ -175,15 +177,9 @@ backlightOFF();
   tft.setTextColor(ILI9341_WHITE);
   tft.fillScreen(ILI9341_BLACK);
   splashScreen();
-  xTaskCreatePinnedToCore(
-    core0Task,    // Hàm thực thi lõi CPU 0
-    "Core 0 Task", // Tên luồng
-    10000,        // Kích thước ngăn xếp (bytes)
-    NULL,         // Tham số truyền vào hàm thực thi
-    1,            // Độ ưu tiên luồng
-    NULL,         // Task handle
-    0             // Lõi CPU (0 hoặc 1)
-);
+
+ xTaskCreatePinnedToCore(task1, "Task 1", 10000, NULL, 1, NULL, 1);
+
 }
 
 void loop()
@@ -191,8 +187,15 @@ void loop()
   #ifdef enableTX_LED
   digitalWrite(TX_LEDPin, HIGH);    // turn the LED off HIGH(OFF) LOW (ON)
   #endif
-
-  button_Modes();
+    // if(activeConn)
+    // {
+    //   allNeoPixelsGREEN();
+    //   allNeoPixelsOff();
+    // }else
+    // {
+    //   allNeoPixelsBLUE();
+    // }
+    button_Modes();
 }
 void rainbow(uint8_t wait) {
   uint16_t i, j;
@@ -260,7 +263,7 @@ void serialBTEvent() {
   while (SerialBT.available()) {
 
     char inChar = (char)SerialBT.read();
-    Serial.print(inChar); // Debug Incoming Serial
+    //Serial.print(inChar); // Debug Incoming Serial
 
     // add it to the inputString:
     inputString += inChar;
@@ -282,11 +285,13 @@ void serialBTEvent() {
 void activityChecker() {
 
   if (millis() - lastActiveConn > lastActiveDelay)
-
+  {   
     activeConn = false;
+  }
   else
+  {
     activeConn = true;
-
+  }
   if (!activeConn) {
 
 
@@ -344,7 +349,7 @@ void backlightOFF () {
 //----------------------------- Splash Screens --------------------------------
 void splashScreen() {
   /* Initial Boot Screen, */
-  allNeoPixelsOff();
+  allNeoPixelsBLUE();
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
   tft.setFont(&Org_01);
   tft.fillScreen(ILI9341_BLACK);
@@ -398,15 +403,6 @@ void splashScreen() {
     tft.print(BL.getBatteryVolts()); tft.print("v");
   }
   #endif
-
-  #ifdef enable_BT
-    allNeoPixelsBLUE();
-  #else
-    allNeoPixelsRED();
-  #endif
-  backlightOFF();
-
-
   #ifdef batteryMonitor
     // Show Battery Level Indicator on waiting for data screen
     if (BL.getBatteryVolts() <= 3.4 ) {
