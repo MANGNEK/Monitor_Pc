@@ -126,9 +126,9 @@ String set_GPUram = "256";
 #define enable_BoostIndicator    // Show CPU & GPU Turbo/Boost Indicator
 
 //-------------------------------- NeoPixel Modes -------------------------------------
-#define NUM_PIXELS  8
+//#define NUM_PIXELS  100
 /* If  NeoBrightness = 0 Phat-Stats will start with no NeoPixels lit. Turn the Rotary Encoder to turn on the NeoPixels, */
-int NeoBrightness   = 250;           // Global start up brightness
+int NeoBrightness   = 50;           // Global start up brightness
 
 /* Uncomment only one of the below*/
 //#define enable_NeopixelGauges     // NeoPixel ring bargraph example
@@ -162,7 +162,7 @@ volatile int brightness_count = 250; // Start Up PWM Brightness
 /* Debounce  Button, button mode is a bit flaky at present as it needs interrupts, Sometimes it gets caught during a screen refresh
   and does not change. WIO Terminal & ESP32 seem to like 1000ms and works just!!! ok */
 
-int debounceButton = 0; //  Use a 0.1uf/100nf/(104) p capacitor from button Pin to GND if poss
+int debounceButton = 500; //  Use a 0.1uf/100nf/(104) p capacitor from button Pin to GND if poss
 
 /* Delay screen event, to stop screen data corruption ESP8622 / ESP32 use 25, most others 5 or 0 will do*/
 int Serial_eventDelay = 15;  // 15 is the minimum setting for an ESP32 with a Silicon Labs CP210x serial chip
