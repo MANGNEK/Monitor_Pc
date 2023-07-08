@@ -53,7 +53,7 @@
 #define ILI9341_LIGHT_GREY  0x7BE0 //ILI9341_OLIVE
 #endif
 
-#define TX_LEDPin 18
+#define TX_LEDPin 21
 /* Pre-define Hex NeoPixel colours,  eg. pixels.setPixelColor(0, BLUE); https://htmlcolorcodes.com/color-names/ */
 #define neo_BLUE       0x0000FF
 #define neo_GREEN      0x008000
@@ -101,13 +101,13 @@
 #define READS 20
 Pangodream_18650_CL BL(ADC_PIN, CONV_FACTOR, READS);
 #endif
-#define NEOPIN      5
-#define NUM_PIXELS  9 
+#define NEOPIN      19
+#define NUM_PIXELS  8 
 Adafruit_NeoPixel pixels(NUM_PIXELS, NEOPIN, NEO_GRB + NEO_KHZ800);
 int volume=34;
 int mode_Button     = 2; 
 int display_Button_counter = 0;
-int TFT_backlight_PIN = 27;
+int TFT_backlight_PIN = 0;
 int brightness_countLast = 0;   
 int ASPECT = 0; 
 int displayDraw = 0;
@@ -152,13 +152,16 @@ void task1(void *parameter) {
 
 
 void setup() {
+
   SerialBT.begin(device_BT); 
   Serial.begin(baudRate); 
   inputString.reserve(220); 
   pixels.begin();   
   pixels.setBrightness(NeoBrightness); // Atmel Global Brightness
   pixels.show(); // Turn off all Pixels
-  
+
+  pinMode(23, OUTPUT);
+  digitalWrite(23,LOW);
   pinMode(mode_Button, INPUT_PULLUP);
   pinMode(volume, INPUT);
 #ifdef fixedBacklight
