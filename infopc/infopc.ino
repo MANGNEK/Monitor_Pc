@@ -161,11 +161,16 @@ void setup() {
   pixels.show(); // Turn off all Pixels
 
   pinMode(23, OUTPUT);
-  digitalWrite(23,LOW);
+  digitalWrite(23,LOW); 
+
+  pinMode(TX_LEDPin, OUTPUT);
+digitalWrite(TX_LEDPin, LOW);
+
   pinMode(mode_Button, INPUT_PULLUP);
   pinMode(volume, INPUT);
+
 #ifdef fixedBacklight
-  pinMode(TFT_backlight_PIN, OUTPUT); 
+  pinMode(TFT_backlight_PIN, OUTPUT);  
 #else
   analogWriteResolution(TFT_backlight_PIN, 12);
 #endif
@@ -174,8 +179,7 @@ void setup() {
   pinMode(TX_LEDPin, OUTPUT); 
 #endif
 backlightOFF();
- pinMode(TX_LEDPin, OUTPUT);
- digitalWrite(TX_LEDPin, LOW);
+
   delay(200); 
   int ID = tft.readID();
   tft.begin(ID); 
@@ -202,7 +206,7 @@ void loop()
     // {
     //   allNeoPixelsBLUE();
     // }
-    int value_volume=analogRead(volume)/200;
+    //int value_volume=analogRead(volume)/200;
     //Serial.println(value_volume);
     button_Modes();
 }
@@ -225,9 +229,9 @@ void rainbowCycle(uint8_t wait) {
       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
     }
     pixels.show();
-    value_volume=analogRead(volume);
+    //int value_volume=analogRead(volume);
     //Serial.println(value_volume);
-    pixels.setBrightness(value_volume/16);
+    //pixels.setBrightness(value_volume/16);
     delay(wait);
   }
 }
@@ -275,7 +279,7 @@ void serialBTEvent() {
   while (SerialBT.available()) {
 
     char inChar = (char)SerialBT.read();
-    Serial.print(inChar); // Debug Incoming Serial
+    //Serial.print(inChar); // Debug Incoming Serial
 
     // add it to the inputString:
     inputString += inChar;
