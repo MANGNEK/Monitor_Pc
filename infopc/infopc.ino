@@ -206,8 +206,17 @@ void loop()
     // {
     //   allNeoPixelsBLUE();
     // }
-    //int value_volume=analogRead(volume)/200;
-    //Serial.println(value_volume);
+    //int value_volume=analogRead(volume)/200*;
+    //int test = analogRead(volume);
+    int get_value_volume = analogRead(volume);
+    Serial.print("gia tri 1 :");
+    Serial.println(get_value_volume);
+    delay(1000);
+    int value_light = map(analogRead(volume),0,4095,5,255);
+    int value_volume = value_light;
+    Serial.print("gia tri 2 :");
+    Serial.println(value_volume);
+    delay(1000);
     button_Modes();
 }
 void rainbow(uint8_t wait) {
