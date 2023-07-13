@@ -7,7 +7,7 @@ void button_Modes() {
   int enc_buttonVal = digitalRead(mode_Button);
   if (enc_buttonVal == LOW){
     delay(debounceButton); // Debounce Button
-    display_Button_counter ++;
+ 
 
     /* Clear Screen*/
     backlightOFF();

@@ -114,6 +114,7 @@ int displayDraw = 0;
 int value_volume=0;
 boolean activeConn = false;
 long lastActiveConn = 0;
+bool pressed=false;
 boolean bootMode = true;
 String inputString = "";
 boolean stringComplete = false;
@@ -150,6 +151,11 @@ void task1(void *parameter) {
   }
 }
 
+void IRAM_ATTR btn() {
+     display_Button_counter ++;
+     pressed=true;
+
+}
 
 void setup() {
 
@@ -166,8 +172,11 @@ void setup() {
   pinMode(TX_LEDPin, OUTPUT);
 digitalWrite(TX_LEDPin, LOW);
 
-  pinMode(mode_Button, INPUT_PULLUP);
+  
   pinMode(volume, INPUT);
+
+  pinMode(mode_Button, INPUT_PULLUP);
+  attachInterrupt(mode_Button, btn, RISING);
 
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT);  
@@ -373,8 +382,11 @@ void backlightOFF () {
 #endif
 //----------------------------- Splash Screens --------------------------------
 void splashScreen() {
+  pressed=false;
+
   /* Initial Boot Screen, */
   allNeoPixelsBLUE();
+  
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
   tft.setFont(&Org_01);
   tft.fillScreen(ILI9341_BLACK);
