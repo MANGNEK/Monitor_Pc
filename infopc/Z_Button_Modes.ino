@@ -4,14 +4,15 @@
 
 void button_Modes() {
 
-  int enc_buttonVal = digitalRead(mode_Button);
-  if (enc_buttonVal == LOW){
-    delay(debounceButton); // Debounce Button
- 
+  //int enc_buttonVal = digitalRead(mode_Button);
+  if (pressed == true){
+    pressed=false;
+    // delay(debounceButton); // Debounce Button
+     display_Button_counter ++;
 
-    /* Clear Screen*/
-    backlightOFF();
-    tft.fillScreen(ILI9341_BLACK);
+    // /* Clear Screen*/
+     backlightOFF();
+     tft.fillScreen(ILI9341_BLACK);
 
     /* Reset count if over max mode number, */
     if (display_Button_counter == 5) // Number of screens available when button pressed

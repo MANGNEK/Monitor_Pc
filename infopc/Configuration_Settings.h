@@ -220,5 +220,5 @@ int baudRate  = 9600; // set serial baud rate to match that of HardwareSerialMon
 //#define Debug
 
 //-------------- Show Networks Stats when using Phatstats edition of WeeStatServer ---------------
-#define enable_LibreNet // Reserved // undefine  enable_gpuCore, enable_gpuShader, enable_gpuShader first, enable_gpuPowerStats
+//#define enable_LibreNet // Reserved // undefine  enable_gpuCore, enable_gpuShader, enable_gpuShader first, enable_gpuPowerStats
 //--------------------------- Throttle/Boost Gains MHZ or % ------------------------------

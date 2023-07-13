@@ -114,8 +114,8 @@ int displayDraw = 0;
 int value_volume=0;
 boolean activeConn = false;
 long lastActiveConn = 0;
-bool pressed=false;
 boolean bootMode = true;
+bool pressed=false;
 String inputString = "";
 boolean stringComplete = false;
 BluetoothSerial SerialBT;   
@@ -151,11 +151,19 @@ void task1(void *parameter) {
   }
 }
 
-void IRAM_ATTR btn() {
-     display_Button_counter ++;
-     pressed=true;
+void IRAM_ATTR pressbt() {
+      pressed=true;
 
-}
+    // display_Button_counter ++;
+    // backlightOFF();
+    // tft.fillScreen(ILI9341_BLACK);
+
+    // /* Reset count if over max mode number, */
+    // if (display_Button_counter == 5) // Number of screens available when button pressed
+    // {
+    //   display_Button_counter = 0;
+    // }
+    }
 
 void setup() {
 
@@ -172,11 +180,9 @@ void setup() {
   pinMode(TX_LEDPin, OUTPUT);
 digitalWrite(TX_LEDPin, LOW);
 
-  
-  pinMode(volume, INPUT);
-
   pinMode(mode_Button, INPUT_PULLUP);
-  attachInterrupt(mode_Button, btn, RISING);
+  pinMode(volume, INPUT);
+  attachInterrupt(mode_Button, pressbt, RISING);
 
 #ifdef fixedBacklight
   pinMode(TFT_backlight_PIN, OUTPUT);  
@@ -215,18 +221,10 @@ void loop()
     // {
     //   allNeoPixelsBLUE();
     // }
-    //int value_volume=analogRead(volume)/200*;
-    //int test = analogRead(volume);
-    int get_value_volume = analogRead(volume);
-    Serial.print("gia tri 1 :");
-    Serial.println(get_value_volume);
-    delay(1000);
-    int value_light = map(analogRead(volume),0,4095,5,255);
-    int value_volume = value_light;
-    Serial.print("gia tri 2 :");
-    Serial.println(value_volume);
-    delay(1000);
+    //int value_volume=analogRead(volume)/200;
+    //Serial.println(value_volume);
     button_Modes();
+    Serial.println(display_Button_counter);
 }
 void rainbow(uint8_t wait) {
   uint16_t i, j;
@@ -247,10 +245,10 @@ void rainbowCycle(uint8_t wait) {
       pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
     }
     pixels.show();
-    //int value_volume=analogRead(volume);
+    int value_volume=analogRead(volume);
     //Serial.println(value_volume);
-    //pixels.setBrightness(value_volume/16);
-    delay(wait);
+    pixels.setBrightness(value_volume/15);
+    delay(1);
   }
 }
 uint32_t Wheel(byte WheelPos) {
@@ -383,10 +381,8 @@ void backlightOFF () {
 //----------------------------- Splash Screens --------------------------------
 void splashScreen() {
   pressed=false;
-
   /* Initial Boot Screen, */
   allNeoPixelsBLUE();
-  
   tft.setRotation(0);// Rotate the display at the start:  0, 1, 2 or 3 = (0, 90, 180 or 270 degrees)
   tft.setFont(&Org_01);
   tft.fillScreen(ILI9341_BLACK);
